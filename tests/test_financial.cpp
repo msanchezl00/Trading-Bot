@@ -11,13 +11,15 @@
  * or directly:
  *   g++ -std=c++17 -I../include ../src/FinancialCalculator.cpp \
  *       ../src/RiskAnalysis.cpp ../src/ProfitabilityMetrics.cpp \
- *       ../src/TradingBot.cpp test_financial.cpp -o test_financial && ./test_financial
+ *       ../src/TradingBot.cpp ../src/DataFetcher.cpp \
+ *       test_financial.cpp -lcurl -o test_financial && ./test_financial
  */
 
 #include "FinancialCalculator.hpp"
 #include "RiskAnalysis.hpp"
 #include "ProfitabilityMetrics.hpp"
 #include "TradingBot.hpp"
+#include "DataFetcher.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -385,6 +387,60 @@ TEST(test_full_pipeline_runs_without_error) {
     // Running the bot should not throw.
     std::string advice = TradingBot::getAdvice(data);
     ASSERT_FALSE(advice.empty());
+}
+
+// ------------------------------------------------------------------ //
+// DataFetcher::readScope tests                                         //
+// ------------------------------------------------------------------ //
+
+TEST(test_read_scope_basic) {
+    const std::string path = "/tmp/test_trading_bot_scope.txt";
+    {
+        std::ofstream f(path);
+        f << "AAPL\n"
+          << "MSFT\n"
+          << "GOOG\n";
+    }
+    auto tickers = DataFetcher::readScope(path);
+    ASSERT_EQ(tickers.size(), 3u);
+    ASSERT_TRUE(tickers[0] == "AAPL");
+    ASSERT_TRUE(tickers[1] == "MSFT");
+    ASSERT_TRUE(tickers[2] == "GOOG");
+}
+
+TEST(test_read_scope_skips_comments_and_blanks) {
+    const std::string path = "/tmp/test_trading_bot_scope_comments.txt";
+    {
+        std::ofstream f(path);
+        f << "# crypto\n"
+          << "BTC-USD\n"
+          << "\n"
+          << "# stocks\n"
+          << "AAPL\n"
+          << "  \n"   // whitespace-only line
+          << "TSLA\n";
+    }
+    auto tickers = DataFetcher::readScope(path);
+    ASSERT_EQ(tickers.size(), 3u);
+    ASSERT_TRUE(tickers[0] == "BTC-USD");
+    ASSERT_TRUE(tickers[2] == "TSLA");
+}
+
+TEST(test_read_scope_missing_file_throws) {
+    ASSERT_THROWS(DataFetcher::readScope("/tmp/nonexistent_scope_xyz.txt"));
+}
+
+TEST(test_read_scope_trims_whitespace) {
+    const std::string path = "/tmp/test_trading_bot_scope_trim.txt";
+    {
+        std::ofstream f(path);
+        f << "  AAPL  \n"
+          << "\tMSFT\t\n";
+    }
+    auto tickers = DataFetcher::readScope(path);
+    ASSERT_EQ(tickers.size(), 2u);
+    ASSERT_TRUE(tickers[0] == "AAPL");
+    ASSERT_TRUE(tickers[1] == "MSFT");
 }
 
 // ------------------------------------------------------------------ //

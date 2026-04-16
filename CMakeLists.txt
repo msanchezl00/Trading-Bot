@@ -18,6 +18,11 @@ else()
 endif()
 
 # -----------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------
+find_package(CURL REQUIRED)
+
+# -----------------------------------------------------------------------
 # Include directories
 # -----------------------------------------------------------------------
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -30,11 +35,15 @@ add_library(trading_bot_lib STATIC
     src/RiskAnalysis.cpp
     src/ProfitabilityMetrics.cpp
     src/TradingBot.cpp
+    src/DataFetcher.cpp
 )
 
 target_include_directories(trading_bot_lib PUBLIC
     ${PROJECT_SOURCE_DIR}/include
+    ${CURL_INCLUDE_DIRS}
 )
+
+target_link_libraries(trading_bot_lib PUBLIC ${CURL_LIBRARIES})
 
 # -----------------------------------------------------------------------
 # Main executable
@@ -61,3 +70,4 @@ endif()
 # -----------------------------------------------------------------------
 install(TARGETS trading_bot RUNTIME DESTINATION bin)
 install(DIRECTORY include/ DESTINATION include/trading_bot)
+
