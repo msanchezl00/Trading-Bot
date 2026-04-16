@@ -32,7 +32,7 @@ static FinancialCalculator::MarketData buildDemoData() {
     d.asset = "DEMO";
 
     // 20 synthetic weekly bars with an uptrend followed by a small pullback.
-    const struct { const char* date; double o; double h; double l; double c; long long v; }
+    const struct { const char* date; double open; double high; double low; double close; long long volume; }
     rows[] = {
         {"2024-01-01", 100.0, 103.0,  98.0, 102.0,  900000LL},
         {"2024-01-08", 102.0, 106.0, 100.0, 105.0, 1100000LL},
@@ -59,11 +59,11 @@ static FinancialCalculator::MarketData buildDemoData() {
     for (const auto& r : rows) {
         PriceRecord rec;
         rec.date   = r.date;
-        rec.open   = r.o;
-        rec.high   = r.h;
-        rec.low    = r.l;
-        rec.close  = r.c;
-        rec.volume = r.v;
+        rec.open   = r.open;
+        rec.high   = r.high;
+        rec.low    = r.low;
+        rec.close  = r.close;
+        rec.volume = r.volume;
         d.prices.push_back(rec);
     }
     return d;

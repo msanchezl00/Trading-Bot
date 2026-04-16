@@ -5,6 +5,9 @@
 
 namespace TradingBot {
 
+/// Minimum average volume required to generate a strong buy or sell signal.
+static constexpr double MIN_AVERAGE_VOLUME_THRESHOLD = 100000.0;
+
 std::string getAdvice(const FinancialCalculator::MarketData& data) {
     const std::size_t n = data.prices.size();
 
@@ -44,7 +47,7 @@ std::string getAdvice(const FinancialCalculator::MarketData& data) {
     // Golden Cross branch                                                  //
     // ------------------------------------------------------------------ //
     if (hasGoldenCross) {
-        if (avgVolume > 100000.0) {
+        if (avgVolume > MIN_AVERAGE_VOLUME_THRESHOLD) {
             if (lastDailyReturn > 0.0) {
                 if (lastCumulativeReturn > 0.0) {
                     if (lastSMA > lastEMA) {
@@ -89,7 +92,7 @@ std::string getAdvice(const FinancialCalculator::MarketData& data) {
     // Death Cross branch                                                   //
     // ------------------------------------------------------------------ //
     if (hasDeathCross) {
-        if (avgVolume > 100000.0) {
+        if (avgVolume > MIN_AVERAGE_VOLUME_THRESHOLD) {
             if (lastDailyReturn < 0.0) {
                 if (lastCumulativeReturn < 0.0) {
                     if (lastSMA < lastEMA) {
