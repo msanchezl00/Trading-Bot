@@ -247,6 +247,8 @@ FinancialCalculator::MarketData fetchFromYahooFinance(
         const std::string& ticker, const std::string& period) {
 
     // Map yfinance's "1wk" alias to the Yahoo Finance range "5d".
+    // yfinance interprets "1wk" as the last ~5 trading days (one calendar week).
+    // Yahoo Finance's own chart API uses "5d" for the same range.
     std::string range = (period == "1wk") ? "5d" : period;
 
     // Yahoo Finance v8 chart JSON endpoint – no crumb required for read-only.

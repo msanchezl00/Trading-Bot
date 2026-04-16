@@ -423,6 +423,7 @@ TEST(test_read_scope_skips_comments_and_blanks) {
     auto tickers = DataFetcher::readScope(path);
     ASSERT_EQ(tickers.size(), 3u);
     ASSERT_TRUE(tickers[0] == "BTC-USD");
+    ASSERT_TRUE(tickers[1] == "AAPL");
     ASSERT_TRUE(tickers[2] == "TSLA");
 }
 
