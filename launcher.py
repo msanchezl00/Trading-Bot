@@ -11,11 +11,11 @@ with open("scope.txt", "r") as fscope:
 # period time 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
 period = "1wk"
 
-#window suele ser de 50 y 200 sesiones
+# window suele ser de 50 y 200 sesiones
 window = 50
 
 # Table header
-table_header = ["Asset", "Trading Advice", "Period"]
+table_header = ["Asset", "RSI", "Sharpe Ratio", "Trading Advice", "Period"]
 
 # Table data
 table_data = []
@@ -25,19 +25,31 @@ for asset in scope:
     # Get historical price data for the last 6 months
     data = yf.Ticker(asset).history(period)
 
-    # Apply financial analysis module
-    data_with_returns = financial_analysis.calculate_returns(data)
-    data_with_cumulative_returns = financial_analysis.calculate_cumulative_returns(data_with_returns)
-    data_with_avg_volume = financial_analysis.calculate_average_daily_volume(data_with_cumulative_returns)
+    # --- Basic financial analysis ---
+    data = financial_analysis.calculate_returns(data)
+    data = financial_analysis.calculate_cumulative_returns(data)
+    data = financial_analysis.calculate_average_daily_volume(data)
 
-    # Calculate and plot moving averages with additional financial analysis, and set de window for calculate it
-    data_with_ma_crosses = calculate_moving_averages_and_crosses(asset, data_with_avg_volume, window)
+    # --- Advanced financial analysis ---
+    data = financial_analysis.calculate_volatility(data)
+    data = financial_analysis.calculate_rsi(data)
+    data = financial_analysis.calculate_macd(data)
+    data = financial_analysis.calculate_bollinger_bands(data)
+
+    # Sharpe Ratio returns a scalar, not a column
+    sharpe = financial_analysis.calculate_sharpe_ratio(data)
+
+    # Calculate moving averages and cross signals
+    data = calculate_moving_averages_and_crosses(asset, data, window)
 
     # Use the trading bot to get advice
-    bot_advice = trading_bot.bot_advice(data_with_ma_crosses)
+    advice = trading_bot.bot_advice(data)
+
+    # Extract the latest RSI value for display (default to 50 if column missing)
+    rsi_value = round(float(data['RSI'].iloc[-1]) if 'RSI' in data.columns else 50, 1)
 
     # Add data to the table
-    table_data.append([asset, bot_advice, period])
+    table_data.append([asset, rsi_value, sharpe, advice, period])
 
 # Print the table
 print(tabulate(table_data, headers=table_header, tablefmt="fancy_grid"))
