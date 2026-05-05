@@ -12,7 +12,7 @@ with open("scope.txt", "r") as fscope:
 period = "6mo"
 
 # window suele ser de 50 y 200 sesiones
-window = 50
+window = 100
 
 # Table header
 table_header = ["Asset", "RSI", "Sharpe Ratio", "Trading Advice", "Period"]
