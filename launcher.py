@@ -9,7 +9,7 @@ with open("scope.txt", "r") as fscope:
     scope = fscope.read().splitlines()
 
 # period time 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
-period = "1wk"
+period = "6mo"
 
 # window suele ser de 50 y 200 sesiones
 window = 50
